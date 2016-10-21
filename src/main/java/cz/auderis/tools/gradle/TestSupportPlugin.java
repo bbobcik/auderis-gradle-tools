@@ -5,6 +5,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.ConventionMapping;
 import org.gradle.api.internal.IConventionAware;
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact;
@@ -101,7 +102,7 @@ public class TestSupportPlugin implements Plugin<Project> {
         final ConfigurationContainer configurations = project.getConfigurations();
         final Configuration supportConfiguration = configurations.create(SUPPORT_CONFIGURATION_NAME);
         supportConfiguration.setDescription("Configuration for test support artifacts");
-        supportConfiguration.setVisible(false);
+        supportConfiguration.setVisible(true);
 
         // Make the new configuration extend a configuration created by JavaBasePlugin
         final SourceSet supportSet = pluginConvention.getSourceSets().getByName(SUPPORT_SOURCE_SET_NAME);
@@ -152,7 +153,7 @@ public class TestSupportPlugin implements Plugin<Project> {
         supportSourceJarTask.setDescription("Assembles a jar containing test support sources");
         supportSourceJarTask.setGroup(BasePlugin.BUILD_GROUP);
         supportSourceJarTask.setAppendix(SUPPORT_JAR_APPENDIX);
-        supportSourceJarTask.setClassifier("source");
+        supportSourceJarTask.setClassifier("sources");
         supportSourceJarTask.from(supportSet.getAllJava());
 
         // Define task for Javadoc JAR
@@ -170,8 +171,10 @@ public class TestSupportPlugin implements Plugin<Project> {
         final ArchivePublishArtifact supportJavadocArtifact = new ArchivePublishArtifact(supportJavadocJarTask);
         final Configuration supportConfiguration = project.getConfigurations().getByName(SUPPORT_CONFIGURATION_NAME);
         supportConfiguration.getArtifacts().add(supportArtifact);
-        supportConfiguration.getArtifacts().add(supportSourceArtifact);
-        supportConfiguration.getArtifacts().add(supportJavadocArtifact);
+        final Configuration archivesConfiguration = project.getConfigurations().getByName(Dependency.ARCHIVES_CONFIGURATION);
+        archivesConfiguration.getArtifacts().add(supportArtifact);
+        archivesConfiguration.getArtifacts().add(supportSourceArtifact);
+        archivesConfiguration.getArtifacts().add(supportJavadocArtifact);
 
         final DefaultArtifactPublicationSet publicationSet = project.getExtensions().getByType(DefaultArtifactPublicationSet.class);
         publicationSet.addCandidate(supportArtifact);
