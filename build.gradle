@@ -3,7 +3,7 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 
 group 'cz.auderis'
-version '1.0.0'
+version '1.0.1-SNAPSHOT'
 
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
