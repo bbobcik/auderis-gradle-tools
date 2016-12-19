@@ -4,6 +4,7 @@ Small but useful additions for Gradle build system
 ## Changelog
 
 ### 1.0.1 
+  * `SemanticVersion` class added
   * Build system change (Gradle instead of Maven)
 
 ### 1.0.0 Initial release
@@ -58,3 +59,37 @@ Plugin usage
         testSupportCompile 'org.hamcrest:hamcrest-all:1.3'
         ...
     }
+
+## Semantic versioning
+
+As specified in Gradle documentation, project/module version may be an object of any type. Gradle uses its
+`toString()` to obtain the version string. However often there is a need for other, more detailed inspection
+of version number structure.
+
+When adopting [Semantic Versioning](http://http://semver.org/) approach, a convenient class is made available
+by this library for Gradle scripts. The version may be defined either directly in the script or loaded from
+an external resource, such as a file or even URL. 
+
+    import cz.auderis.tools.gradle.SemanticVersion
+
+    // build.gradle
+    buildscript {
+        // Define where to find the plugin module, e.g. mavenCentral()
+    }
+    
+    // Use direct specification
+    project.version = SemanticVersion.is("1.0.0-SNAPSHOT")
+    
+    // Load version specification from a file
+    project version = SemanticVersion.from("version.txt")
+
+An instance of `SemanticVersion` class has, among others, the following properties:
+
+  * `majorVersion` (with convenient alias `major`) returns first numeric part X from version X.Y.Z
+  * `minorVersion` (with convenient alias `minor`) returns numeric part Y from version X.Y.Z
+  * `patchRevision` (with convenient aliases `patch` and `patchLevel`) returns numeric part Z from version X.Y.Z
+  * `prerelease` is a boolean flag that indicates that either major version is 0 or there are pre-release identifiers
+    present (part P in version string X.Y.Z-P). There is an alias `preRelease` available as well.
+  * `stable` is a boolean flag that is effectively a negation of `prerelease` property
+  * `snapshot` is a boolean flag that indicates whether a special pre-release ID `SNAPSHOT` is present
+    in the version string (i.e. "1.4.2-SNAPSHOT")
