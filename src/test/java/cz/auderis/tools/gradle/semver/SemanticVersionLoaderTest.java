@@ -18,7 +18,6 @@ package cz.auderis.tools.gradle.semver;
 
 import cz.auderis.test.category.IntegrationTest;
 import cz.auderis.test.rule.WorkFolder;
-import cz.auderis.tools.gradle.semver.SemanticVersion;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.BeforeClass;
@@ -72,7 +71,7 @@ public class SemanticVersionLoaderTest {
     })
     public void shouldLoadCorrectVersionFromFile(String src, String expectedVersionSpec) throws Exception {
         // Given
-        final File srcFile = folder.newResourceCopy(src, "semver/" + src);
+        final File srcFile = folder.newResourceCopy(src, "spec/" + src);
         final SemanticVersion expectedVersion = SemanticVersion.is(expectedVersionSpec);
 
         // When
@@ -85,10 +84,10 @@ public class SemanticVersionLoaderTest {
     @Test
     @Category(IntegrationTest.class)
     @Parameters({
-            "testres:///semver/basic.version      | 2.4.6-SNAPSHOT+Build-4843",
-            "testres:///semver/whitespace.version | 11.13.17-Beta",
-            "testres:///semver/comment1.version   | 5.8.13+Fibonacci",
-            "testres:///semver/comment2.version   | 2.7.18-Euler",
+            "testres:///spec/basic.version      | 2.4.6-SNAPSHOT+Build-4843",
+            "testres:///spec/whitespace.version | 11.13.17-Beta",
+            "testres:///spec/comment1.version   | 5.8.13+Fibonacci",
+            "testres:///spec/comment2.version   | 2.7.18-Euler",
     })
     public void shouldLoadCorrectVersionFromUrl(String url, String expectedVersionSpec) throws Exception {
         final URL srcUrl = new URL(url);
