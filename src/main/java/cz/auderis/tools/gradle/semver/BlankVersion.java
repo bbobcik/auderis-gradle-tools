@@ -1,6 +1,7 @@
 package cz.auderis.tools.gradle.semver;
 
 import org.gradle.api.Project;
+import org.gradle.api.plugins.ExtensionContainer;
 
 import java.io.File;
 import java.io.InputStream;
@@ -43,7 +44,10 @@ public class BlankVersion {
      * @param versionSpecification semantic version text representation
      */
     public void is(String versionSpecification) {
-        final SemanticVersion version = SemanticVersion.is(versionSpecification);
+        SemanticVersion version = getOverride();
+        if (null == version) {
+            version = SemanticVersion.is(versionSpecification);
+        }
         getOwner().setVersion(version);
     }
 
@@ -54,7 +58,10 @@ public class BlankVersion {
      * @param stream stream that contains semantic version specification
      */
     public void from(InputStream stream) {
-        final SemanticVersion version = SemanticVersion.from(stream);
+        SemanticVersion version = getOverride();
+        if (null == version) {
+            version = SemanticVersion.from(stream);
+        }
         getOwner().setVersion(version);
     }
 
@@ -65,7 +72,10 @@ public class BlankVersion {
      * @param versionHolder file that contains semantic version specification
      */
     public void from(File versionHolder) {
-        final SemanticVersion version = SemanticVersion.from(versionHolder);
+        SemanticVersion version = getOverride();
+        if (null == version) {
+            version = SemanticVersion.from(versionHolder);
+        }
         getOwner().setVersion(version);
     }
 
@@ -76,7 +86,10 @@ public class BlankVersion {
      * @param url URL of a semantic version specification
      */
     public void from(URL url) {
-        final SemanticVersion version = SemanticVersion.from(url);
+        SemanticVersion version = getOverride();
+        if (null == version) {
+            version = SemanticVersion.from(url);
+        }
         getOwner().setVersion(version);
     }
 
@@ -87,7 +100,10 @@ public class BlankVersion {
      * @param source source location where a semantic version can be read
      */
     public void from(String source) {
-        final SemanticVersion version = SemanticVersion.from(source);
+        SemanticVersion version = getOverride();
+        if (null == version) {
+            version = SemanticVersion.from(source);
+        }
         getOwner().setVersion(version);
     }
 
@@ -97,6 +113,13 @@ public class BlankVersion {
             throw new IllegalStateException("Project reference was destroyed");
         }
         return project;
+    }
+
+    private SemanticVersion getOverride() {
+        final Project project = getOwner();
+        final ExtensionContainer extensions = project.getExtensions();
+        final SemanticVersionExtension ext = extensions.findByType(SemanticVersionExtension.class);
+        return (null != ext) ? ext.getVersionOverride() : null;
     }
 
 }

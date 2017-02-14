@@ -16,6 +16,7 @@
 
 package cz.auderis.tools.gradle.semver;
 
+import org.gradle.StartParameter;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
@@ -90,9 +91,28 @@ public class SemanticVersionExtension {
         return null;
     }
 
+    public void allowOverrideFromEnvironment(String environmentVariableName) {
+        if (null == environmentVariableName) {
+            throw new NullPointerException("undefined environment variable name");
+        } else if (environmentVariableName.isEmpty()) {
+            throw new IllegalArgumentException("invalid environment variable name: ''");
+        }
+        final EnvironmentVersionOverride envOverride = new EnvironmentVersionOverride(environmentVariableName);
+        overrideSources.add(envOverride);
+    }
 
+    public void allowOverrideFromParameter(String propertyName) {
+        if (null == propertyName) {
+            throw new NullPointerException("undefined start parameter name");
+        } else if (propertyName.isEmpty()) {
+            throw new IllegalArgumentException("invalid start parameter name: ''");
+        }
+        final StartParameter params = project.getGradle().getStartParameter();
+        final StartParameterVersionOverride paramOverride = new StartParameterVersionOverride(params, propertyName);
+        overrideSources.add(paramOverride);
+    }
 
-    private SemanticVersion getVersionOverride() {
+    SemanticVersion getVersionOverride() {
         VersionOverrideSource overrideSource = null;
         for (final VersionOverrideSource overrideCandidate : overrideSources) {
             if (overrideCandidate.isActive()) {
@@ -107,15 +127,11 @@ public class SemanticVersionExtension {
         if (null == overrideSpec) {
             return null;
         }
-
-
         if (!SemanticVersion.validId(overrideSpec)) {
             throw new InvalidUserDataException("Invalid semantic version: " + overrideSource);
         }
         project.getLogger().info("Using project version override: {}", overrideSource);
-
-
-        return null;
+        return SemanticVersion.parse(overrideSpec);
     }
 
 }
