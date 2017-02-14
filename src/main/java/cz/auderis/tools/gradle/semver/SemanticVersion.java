@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Boleslav Bobcik - Auderis
+ * Copyright 2017 Boleslav Bobcik - Auderis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cz.auderis.tools.gradle;
+package cz.auderis.tools.gradle.semver;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.InvalidUserDataException;
@@ -41,12 +41,12 @@ import java.util.regex.Pattern;
  * Gradle uses its {@code toString()} to obtain the version string. However often there is
  * a need for other, more detailed inspection of version number structure.
  * <p>
- * When adopting <a href="http://http://semver.org">Semantic Versioning</a> approach,
+ * When adopting <a href="http://semver.org">Semantic Versioning</a> approach,
  * a convenient class is made available by this library for Gradle scripts. The version may
  * be defined either directly in the script or loaded from an external resource, such as
  * a file or even URL.
  * <pre>
- * import cz.auderis.tools.gradle.SemanticVersion
+ * import cz.auderis.tools.gradle.semver.SemanticVersion
  *
  * // build.gradle
  * buildscript {
@@ -106,6 +106,24 @@ public class SemanticVersion implements Serializable, Comparable<SemanticVersion
     List<String> preReleaseIdentifiers;
     List<String> buildMetadataIdentifiers;
     private transient String stringRepresentation;
+
+
+    public static boolean isValid(String specification) {
+        if (null == specification) {
+            return false;
+        }
+        final Matcher specMatcher = PATTERN.matcher(specification);
+        return specMatcher.matches();
+    }
+
+    static SemanticVersion parse(String specification) {
+        assert null != specification : "Semantic version specification is undefined";
+        final Matcher specMatcher = PATTERN.matcher(specification);
+        final boolean specOk = specMatcher.matches();
+        assert specOk : "Semantic version specification is invalid: " + specification;
+        final SemanticVersion semanticVersion = parseSpecification(specMatcher);
+        return semanticVersion;
+    }
 
     /**
      * Creates an instance of semantic version directly from the provided version string
@@ -263,40 +281,100 @@ public class SemanticVersion implements Serializable, Comparable<SemanticVersion
         // Used for serialization
     }
 
-    // Convenience property alias
+    /**
+     * Convenient property alias, returning major version number (part X in X.Y.Z)
+     * @return major version number
+     */
     @Deprecated
     public int getMajor() {
         return major;
     }
 
+    /**
+     * Return major version number (part X in X.Y.Z)
+     * @return major version number
+     */
     public int getMajorVersion() {
         return major;
     }
 
-    // Convenience property alias
+    /**
+     * Returns a copy of this version object; given that this version is X.Y.Z, the returned
+     * version will be (X+1).0.0. Additionally, pre-release and build metadata identifiers
+     * will be empty (see {@link #withPreReleaseIdentifiersFrom(SemanticVersion)}
+     * and {@link #withBuildMetadataIdentifiersFrom(SemanticVersion)} for ways how to copy these identifiers
+     * as well)
+     * @return version object with major version number incremented and minor/patch version numbers reset to zero
+     */
+    public SemanticVersion incrementMajorVersion() {
+        return new SemanticVersion(major + 1, 0, 0);
+    }
+
+    /**
+     * Convenient property alias, returning minor version number (part Y in X.Y.Z)
+     * @return minor version number
+     */
     @Deprecated
     public int getMinor() {
         return minor;
     }
 
+    /**
+     * Return minor version number (part Y in X.Y.Z)
+     * @return minor version number
+     */
     public int getMinorVersion() {
         return minor;
     }
 
-    // Convenience property alias
+    /**
+     * Returns a copy of this version object; given that this version is X.Y.Z, the returned
+     * version will be X.(Y+1).0. Additionally, pre-release and build metadata identifiers
+     * will be empty (see {@link #withPreReleaseIdentifiersFrom(SemanticVersion)}
+     * and {@link #withBuildMetadataIdentifiersFrom(SemanticVersion)} for ways how to copy these identifiers
+     * as well)
+     * @return version object with minor version number incremented and patch version numbers reset to zero
+     */
+    public SemanticVersion incrementMinorVersion() {
+        return new SemanticVersion(major, minor + 1, 0);
+    }
+
+    /**
+     * Convenient property alias, returning patch version number (part Z in X.Y.Z)
+     * @return patch version number
+     */
     @Deprecated
     public int getPatch() {
         return patch;
     }
 
-    // Convenience property alias
+    /**
+     * Convenient property alias, returning patch version number (part Z in X.Y.Z)
+     * @return patch version number
+     */
     @Deprecated
     public int getPatchLevel() {
         return patch;
     }
 
+    /**
+     * Return patch version number (part Z in X.Y.Z)
+     * @return patch version number
+     */
     public int getPatchRevision() {
         return patch;
+    }
+
+    /**
+     * Returns a copy of this version object; given that this version is X.Y.Z, the returned
+     * version will be X.Y.(Z+1). Additionally, pre-release and build metadata identifiers
+     * will be empty (see {@link #withPreReleaseIdentifiersFrom(SemanticVersion)}
+     * and {@link #withBuildMetadataIdentifiersFrom(SemanticVersion)} for ways how to copy these identifiers
+     * as well)
+     * @return version object with minor version number incremented and patch version numbers reset to zero
+     */
+    public SemanticVersion incrementPatchLevel() {
+        return new SemanticVersion(major, minor, patch + 1);
     }
 
     // Convenience alias to prevent errors when referencing properties
@@ -304,18 +382,47 @@ public class SemanticVersion implements Serializable, Comparable<SemanticVersion
         return isPreRelease();
     }
 
+    /**
+     * Indicates whether this object represents unstable, pre-release version. There are 2 factors
+     * that make version unstable; if one or both are satisfied, the version is considered pre-release:
+     * <ul>
+     * <li>Major version number is 0</li>
+     * <li>The list of pre-release identifiers is not empty</li>
+     * </ul>
+     * @return {@code true} if this version is unstable (i.e. major version is 0 and/or there are
+     *         any pre-release identifiers present)
+     */
     public boolean isPreRelease() {
         return (0 == major) || !preReleaseIdentifiers.isEmpty();
     }
 
+    /**
+     * Indicates whether this object represents stable, release-ready version. There are 2 factors
+     * that make version stable; both of them must be satisfied at the same time:
+     * <ul>
+     * <li>Major version number is greater than 0</li>
+     * <li>The list of pre-release identifiers is empty</li>
+     * </ul>
+     * @return {@code true} if this version is stable (i.e. major version &ge; 1 and there are
+     *         no pre-release identifiers present)
+     */
     public boolean isStable() {
         return (0 != major) && preReleaseIdentifiers.isEmpty();
     }
 
+    /**
+     * Indicates whether this object represent snapshot version; such versions have pre-release ID
+     * {@code SNAPSHOT} present (e.g. 1.4.5-SNAPSHOT)
+     * @return {@code true} if keyword {@code SNAPSHOT} is present among pre-release identifiers
+     */
     public boolean isSnapshot() {
         return preReleaseIdentifiers.contains(SNAPSHOT_ID);
     }
 
+    /**
+     * Returns a list of all pre-release identifiers defined for this object. The returned list is read-only.
+     * @return a list of pre-release identifiers
+     */
     public List<String> getPreReleaseIdentifiers() {
         return Collections.unmodifiableList(preReleaseIdentifiers);
     }
@@ -368,6 +475,16 @@ public class SemanticVersion implements Serializable, Comparable<SemanticVersion
             }
         }
         return extendedVersion;
+    }
+
+    public SemanticVersion withPreReleaseIdentifiersFrom(SemanticVersion referenceVersion) {
+        final SemanticVersion augmented = new SemanticVersion(major, minor, patch);
+        augmented.preReleaseIdentifiers.addAll(preReleaseIdentifiers);
+        augmented.buildMetadataIdentifiers.addAll(buildMetadataIdentifiers);
+        if (null != referenceVersion) {
+            augmented.preReleaseIdentifiers.addAll(referenceVersion.getPreReleaseIds());
+        }
+        return augmented;
     }
 
     public SemanticVersion stripPreReleaseIdentifiers() {
@@ -432,6 +549,16 @@ public class SemanticVersion implements Serializable, Comparable<SemanticVersion
             }
         }
         return extendedVersion;
+    }
+
+    public SemanticVersion withBuildMetadataIdentifiersFrom(SemanticVersion referenceVersion) {
+        final SemanticVersion augmented = new SemanticVersion(major, minor, patch);
+        augmented.preReleaseIdentifiers.addAll(preReleaseIdentifiers);
+        augmented.buildMetadataIdentifiers.addAll(buildMetadataIdentifiers);
+        if (null != referenceVersion) {
+            augmented.buildMetadataIdentifiers.addAll(referenceVersion.getBuildMetadataIds());
+        }
+        return augmented;
     }
 
     public SemanticVersion stripBuildMetadataIdentifiers() {

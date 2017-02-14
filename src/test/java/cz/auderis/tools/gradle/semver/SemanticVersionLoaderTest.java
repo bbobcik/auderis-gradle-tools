@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Boleslav Bobcik - Auderis
+ * Copyright 2017 Boleslav Bobcik - Auderis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package cz.auderis.tools.gradle;
+package cz.auderis.tools.gradle.semver;
 
 import cz.auderis.test.category.IntegrationTest;
 import cz.auderis.test.rule.WorkFolder;
+import cz.auderis.tools.gradle.semver.SemanticVersion;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.BeforeClass;

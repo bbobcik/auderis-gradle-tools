@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Boleslav Bobcik - Auderis
+ * Copyright 2017 Boleslav Bobcik - Auderis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package cz.auderis.tools.gradle;
+package cz.auderis.tools.gradle.semver;
 
 import cz.auderis.test.category.UnitTest;
+import cz.auderis.tools.gradle.semver.SemanticVersion;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.gradle.api.InvalidUserDataException;
+import org.hamcrest.Matcher;
+import org.hamcrest.number.OrderingComparison;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -39,12 +42,12 @@ public class SemanticVersionTest {
     @Test
     @Category(UnitTest.class)
     @Parameters({
-        "0.0.0 | 0 | 0 | 0",
-        "0.1.2 | 0 | 1 | 2",
-        "1.5.0 | 1 | 5 | 0",
-        "256.256.256 | 256 | 256 | 256",
-        "10.4.6-SNAPSHOT | 10 | 4 | 6",
-        "1.0.3+BACKUP | 1 | 0 | 3"
+        "0.0.0           |   0 |   0 |   0",
+        "0.1.2           |   0 |   1 |   2",
+        "1.5.0           |   1 |   5 |   0",
+        "256.256.256     | 256 | 256 | 256",
+        "10.4.6-SNAPSHOT |  10 |   4 |   6",
+        "1.0.3+BACKUP    |   1 |   0 |   3"
     })
     public void shouldParseCorrectKeyParts(String spec, int major, int minor, int patch) throws Exception {
         final SemanticVersion ver = SemanticVersion.is(spec);
@@ -102,16 +105,21 @@ public class SemanticVersionTest {
     @Category(UnitTest.class)
     public void shouldCorrectlyCompareVersions(String spec1, char relation, String spec2) throws Exception {
         // Given
-        final int expectedCmp = ('=' == relation) ? 0 : ('>' == relation ? 1 : -1);
-        final SemanticVersion v1 = SemanticVersion.is(spec1);
-        final SemanticVersion v2 = SemanticVersion.is(spec2);
+        final SemanticVersion referenceVersion = SemanticVersion.is(spec2);
+        final Matcher<? super SemanticVersion> correctlyComparesToReference;
+        if ('=' == relation) {
+            correctlyComparesToReference = OrderingComparison.comparesEqualTo(referenceVersion);
+        } else if ('>' == relation) {
+            correctlyComparesToReference = OrderingComparison.greaterThan(referenceVersion);
+        } else {
+            correctlyComparesToReference = OrderingComparison.lessThan(referenceVersion);
+        }
 
         // When
-        final int cmp = v1.compareTo(v2);
+        final SemanticVersion testedVersion = SemanticVersion.is(spec1);
 
         // Then
-        final int cmpSign = Integer.signum(cmp);
-        assertThat(cmpSign, is(expectedCmp));
+        assertThat(testedVersion, correctlyComparesToReference);
     }
 
 }

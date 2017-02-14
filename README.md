@@ -70,7 +70,7 @@ When adopting [Semantic Versioning](http://http://semver.org/) approach, a conve
 by this library for Gradle scripts. The version may be defined either directly in the script or loaded from
 an external resource, such as a file or even URL. 
 
-    import cz.auderis.tools.gradle.SemanticVersion
+    import cz.auderis.tools.gradle.semver.SemanticVersion
 
     // build.gradle
     buildscript {
