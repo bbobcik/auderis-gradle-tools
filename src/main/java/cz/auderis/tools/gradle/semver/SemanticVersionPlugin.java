@@ -36,6 +36,7 @@ public class SemanticVersionPlugin implements Plugin<Project> {
     public void apply(Project target) {
         createSemanticVersionExtension(target);
         createVersionCheckTask(target);
+        initializeProjectVersion(target);
     }
 
     private void createSemanticVersionExtension(Project project) {
@@ -49,6 +50,19 @@ public class SemanticVersionPlugin implements Plugin<Project> {
         task.setGroup(LifecycleBasePlugin.VERIFICATION_GROUP);
         task.setDescription("Ensures that all dependencies of default configuration have stable versions");
         task.onlyIf(new DefaultConfigurationPresentSpec());
+    }
+
+    private void initializeProjectVersion(Project project) {
+        final Object version = project.getVersion();
+        if ((null == version) || Project.DEFAULT_VERSION.equals(version)) {
+            final BlankVersion blankVersion = new BlankVersion(project);
+            project.setVersion(blankVersion);
+            project.getLogger().debug("Version of {} set to blank semantic version", project);
+        } else if (version instanceof CharSequence) {
+            final SemanticVersion versionInstance = SemanticVersion.parse(version.toString());
+            project.setVersion(versionInstance);
+            project.getLogger().debug("Version of {} changed to semantic version instance: {}", project, versionInstance);
+        }
     }
 
     private static final class DefaultConfigurationPresentSpec implements Spec<Task> {

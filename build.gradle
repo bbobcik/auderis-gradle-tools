@@ -29,7 +29,7 @@ dependencies {
 	}
 	testCompile 'org.hamcrest:hamcrest-all:1.3'
 	testCompile 'cz.auderis:auderis-test-category:1.0.1'
-	testCompile 'cz.auderis:auderis-test-extra:1.2.7'
+	testCompile 'cz.auderis:auderis-test-extra:1.2.8'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
