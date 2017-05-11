@@ -1,7 +1,16 @@
-# auderis-gradle-tools
-Small but useful additions for Gradle build system
+# auderis-gradle-tools &mdash; Build system improvements
+Small but useful additions for Gradle build system.
+
+Keywords: `Gradle`, `plugin`, `semantic versioning`, `test support`
+
+[![Build Status](https://travis-ci.org/bbobcik/auderis-gradle-tools.svg?branch=master)](https://travis-ci.org/bbobcik/auderis-gradle-tools)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.auderis/auderis-gradle-tools/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cz.auderis/auderis-gradle-tools)
+
 
 ## Changelog
+
+### 2.0.0
+  * Semantic versioning mechanism improved
 
 ### 1.0.1 
   * `SemanticVersion` class added
@@ -18,14 +27,18 @@ seems - a novel idea, which leads to a too common "reinventing the wheel". Basic
 to perform certain tests (also known as *assertions*) on library's objects is left to his own devices, which
 results in reader-unfriendly, cumbersome assertion constructs. Compare the following test code:
 
+```
     Customer customer = ...
     assertNotNull( customer.getLastOrder() );
     assertTrue( !customer.getLastOrder().isClosed() );
- 
+```
+
 with alternative
  
+```
     Customer customer = ...
     assertThat( customer, hasLastOrderOpen() );
+```
       
 The difference is that author of the hypothetical `Customer` class spend some time providing an appropriate Hamcrest
 matcher for a certain property (of course provided that the usefulness of the property warrants a dedicated matcher).
@@ -48,6 +61,7 @@ For example, the produced artifacts of a "FooBar" project would be:
 
 Plugin usage
 
+```gradle
     // build.gradle
     buildscript {
         // Define where to find the plugin module, e.g. mavenCentral()
@@ -59,6 +73,7 @@ Plugin usage
         testSupportCompile 'org.hamcrest:hamcrest-all:1.3'
         ...
     }
+```
 
 ## Semantic versioning
 
@@ -70,6 +85,7 @@ When adopting [Semantic Versioning](http://http://semver.org/) approach, a conve
 by this library for Gradle scripts. The version may be defined either directly in the script or loaded from
 an external resource, such as a file or even URL. 
 
+```gradle
     import cz.auderis.tools.gradle.semver.SemanticVersion
 
     // build.gradle
@@ -82,6 +98,7 @@ an external resource, such as a file or even URL.
     
     // Load version specification from a file
     project version = SemanticVersion.from("version.txt")
+```
 
 An instance of `SemanticVersion` class has, among others, the following properties:
 
