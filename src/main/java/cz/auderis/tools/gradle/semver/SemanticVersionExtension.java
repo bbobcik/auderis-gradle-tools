@@ -127,7 +127,7 @@ public class SemanticVersionExtension {
         if (null == overrideSpec) {
             return null;
         }
-        if (!SemanticVersion.validId(overrideSpec)) {
+        if (!SemanticVersion.isValid(overrideSpec)) {
             throw new InvalidUserDataException("Invalid semantic version: " + overrideSource);
         }
         project.getLogger().info("Using project version override: {}", overrideSource);

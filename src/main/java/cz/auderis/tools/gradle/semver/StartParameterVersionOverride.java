@@ -22,7 +22,7 @@ import java.util.Map;
 
 class StartParameterVersionOverride implements VersionOverrideSource {
 
-    public static final String DEFAULT_PARAMETER_NAME = "version";
+    public static final String DEFAULT_PARAMETER_NAME = "versionOverride";
 
     final StartParameter startParameter;
     final String propertyName;
