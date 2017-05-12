@@ -34,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 
 @RunWith(JUnitParamsRunner.class)
+@Category(UnitTest.class)
 public class SemanticVersionTest {
 
     @Rule

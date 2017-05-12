@@ -1,5 +1,6 @@
 package cz.auderis.tools.gradle.semver;
 
+import cz.auderis.test.category.UnitTest;
 import cz.auderis.test.rule.WorkFolder;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -9,6 +10,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +27,7 @@ import static org.hamcrest.Matchers.is;
  * @version 1.0.0
  */
 @RunWith(JUnitParamsRunner.class)
+@Category(UnitTest.class)
 public class BlankVersionTest {
 
     @Rule

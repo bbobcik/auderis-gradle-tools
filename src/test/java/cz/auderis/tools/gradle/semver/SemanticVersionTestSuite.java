@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         SemanticVersionTest.class,
         SemanticVersionLoaderTest.class,
-        SemanticVersionExtensionTest.class
+        SemanticVersionExtensionTest.class,
+        BlankVersionTest.class,
 })
 public class SemanticVersionTestSuite {
 

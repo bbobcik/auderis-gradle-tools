@@ -17,6 +17,7 @@
 package cz.auderis.tools.gradle.semver;
 
 import cz.auderis.test.category.IntegrationTest;
+import cz.auderis.test.category.UnitTest;
 import cz.auderis.test.rule.WorkFolder;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -33,15 +34,19 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
+@Category(UnitTest.class)
 public class SemanticVersionLoaderTest {
 
     @Rule
     public WorkFolder folder = WorkFolder.basic();
+
+    private final static AtomicBoolean handlerDefined = new AtomicBoolean();
 
     @BeforeClass
     public static void prepareUrlHandler() throws Exception {
@@ -57,7 +62,9 @@ public class SemanticVersionLoaderTest {
                 return "testres".equals(protocol) ? streamHandler : null;
             }
         };
-        URL.setURLStreamHandlerFactory(factory);
+        if (handlerDefined.compareAndSet(false, true)) {
+            URL.setURLStreamHandlerFactory(factory);
+        }
     }
 
 

@@ -1,5 +1,8 @@
 package cz.auderis.tools.gradle.semver;
 
+import cz.auderis.test.category.SlowTest;
+import cz.auderis.test.category.UnitTest;
+import cz.auderis.test.category.IntegrationTest;
 import cz.auderis.test.rule.WorkFolder;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -10,6 +13,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.io.File;
@@ -24,6 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @version 1.0.0
  */
 @RunWith(JUnitParamsRunner.class)
+@Category({UnitTest.class, SlowTest.class})
 public class SemanticVersionExtensionTest {
 
     @Rule
@@ -57,6 +62,7 @@ public class SemanticVersionExtensionTest {
     }
 
     @Test
+    @Category(IntegrationTest.class)
     public void shouldEnableExtension() throws Exception {
         // Given
         final ExtensionContainer extensions = project.getExtensions();
@@ -71,6 +77,7 @@ public class SemanticVersionExtensionTest {
     }
 
     @Test
+    @Category(IntegrationTest.class)
     @Parameters({
             "0.0.1-SNAPSHOT",
             "1.2.16",
