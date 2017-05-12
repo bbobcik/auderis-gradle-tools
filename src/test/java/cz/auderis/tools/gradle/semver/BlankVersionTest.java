@@ -80,7 +80,7 @@ public class BlankVersionTest {
 
         // Then
         final Object version = project.getVersion();
-        assertThat(version, is(referenceVersion));
+        assertThat(version, is((Object) referenceVersion));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class BlankVersionTest {
 
         // Then
         final Object version = project.getVersion();
-        assertThat(version, is(referenceVersion));
+        assertThat(version, is((Object) referenceVersion));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class BlankVersionTest {
 
         // Then
         final Object version = project.getVersion();
-        assertThat(version, is(referenceVersion));
+        assertThat(version, is((Object) referenceVersion));
     }
 
 
